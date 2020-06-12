@@ -1,0 +1,160 @@
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function sort_object_of_objects(data, attr) {
+    var arr = [];
+    for (var prop in data) {
+        if (data.hasOwnProperty(prop)) {
+            var obj = {};
+            obj[prop] = data[prop];
+            obj.tempSortName = data[prop][attr];
+            arr.push(obj);
+        }
+    }
+
+    arr.sort(function(a, b) {
+        var at = a.tempSortName,
+            bt = b.tempSortName;
+        return at < bt ? 1 : ( at < bt ? 0 : -1 );
+    });
+
+    var result = [];
+    for (var i=0, l=arr.length; i<l; i++) {
+        var obj = arr[i];
+        delete obj.tempSortName;
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                var id = prop;
+            }
+        }
+        var item = obj[id];
+        result.push(item);
+    }
+    return result;
+}
+
+// function CardCreator(dataPoint){
+//
+//   Total_cases = dataPoint.Total_cases.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+//   Active_cases = dataPoint.Active_cases.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+//   Total_recovered = dataPoint.Total_recovered.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+//
+//   var html_content = '<div class="ui cards content_div"> <div class="card content_div"> <div class="content"> <div class="header"> '+ dataPoint.Country +' </div> <hr><div class="meta"><b>Total Cases: </b>'+ Total_cases +' </div> <div class="meta"><b>Active: </b>'+ Active_cases +' </div> <div class="meta"><b>Recovered: </b>'+ Total_recovered +' </div> </div> </div> </div> '
+//   return html_content;
+// }
+
+// function dataMassaging(data){
+//   // alert(data['World']);
+//   $.each( data, function( key, value ) {
+//     console.log( key + ": " + value );
+//   });
+//   $('#home_body').html(CardCreator(data['World']));
+// }
+
+// function NumberAnimateCommas(div_id_array){
+//   div_id_array.forEach(function(item){
+//     var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',');
+//     console.log(comma_separator_number_step);
+//     var counterValv = $(item).text();
+//     $(item).animateNumber({
+//       number: $(item).text(),
+//       numberStep: comma_separator_number_step
+//     });
+//   });
+// }
+
+function commaSeparateNumber(val){
+  while (/(\d+)(\d{3})/.test(val.toString())){
+    val = val.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  }
+  return val;
+}
+
+function NumberAnimate(div_id_array){
+  div_id_array.forEach(function(item){
+    value_text = $(item).text();
+    $({someValue: 0}).animate({someValue: value_text}, {
+        // duration: 3000,
+        easing: 'swing',
+        step: function () {
+          $(item).text(commaSeparateNumber(Math.round(this.someValue)));
+      }
+    });
+  });
+}
+
+function rowCreator(i,data){
+  return "<tr><td>" + i + "</td><td>" + data['Country'] + "</td><td>" + commaSeparateNumber(data['Total_cases'])+ "</td><td>" + commaSeparateNumber(data['New_cases'])+ "</td><td>" + commaSeparateNumber(data['Total_deaths'])+ "</td><td>" + commaSeparateNumber(data['New_deaths'])+ "</td><td>" + commaSeparateNumber(data['Total_recovered'])+ "</td><td>" + commaSeparateNumber(data['New_recovered'])+ "</td></tr>";
+}
+
+function dataAppend(data_point){
+  console.log(data_point['Total_cases'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+  $('#Confirmed').text(data_point['Total_cases']);
+  $('#Active').text(data_point['Total_cases'] - (data_point['Total_recovered']+data_point['Total_deaths']));
+  $('#Recovered').text(data_point['Total_recovered']);
+  $('#Deaths').text(data_point['Total_deaths']);
+  $('#NewConfirmed').text(commaSeparateNumber(data_point['New_cases']));
+  $('#NewActive').text(commaSeparateNumber(data_point['New_cases'] - (data_point['New_recovered']+data_point['New_deaths'])));
+  $('#NewRecovered').text(commaSeparateNumber(data_point['New_recovered']));
+  $('#NewDeaths').text(commaSeparateNumber(data_point['New_deaths']));
+  NumberAnimate(["#Confirmed","#Recovered","#Deaths","#Active"]);
+  // NumberAnimateCommas(["#Confirmed","#Recovered","#Deaths"]);
+}
+
+function tableAppend(data_point){
+  html_out = "<thead><tr><th>NO.</th><th>Country</th><th>Total Confirmed</th><th>New Cases</th><th>Total Deaths</th><th>New Deaths</th><th>Total Recovered</th><th>New Recovered</th></tr></thead><tbody>";
+
+  var i=1;
+  console.log(data_point);
+  // data_point.sort(function (a, b) {
+  //   return a.Total_cases.localeCompare(b.Total_cases);
+  // });
+  // console.log(data_point);
+
+  $.each(data_point, function(index,jsonObject){
+    html_out += rowCreator(i,jsonObject);
+    i+=1;
+  });
+
+  // console.log(html_out);
+  $('#countries').html(html_out);
+  $('#countries').DataTable();
+}
+
+function ajaxCall(data_url){
+  var csrftoken = getCookie('csrftoken');
+
+  $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+    jqXHR.setRequestHeader('X-CSRFToken', csrftoken);
+  });
+
+  $.ajax({
+    type: "POST",
+    url: data_url,
+  })
+  .done(function( response ) {
+    dataAppend(response['Global']);
+    tableAppend(sort_object_of_objects(response, 'Total_cases'));
+    // console.log(response);
+    console.log(sort_object_of_objects(response, 'Total_cases'));
+  });
+}
+
+$(document).ready(function(){
+  ajaxCall(data_url);
+  // NumberAnimate('#Confirmed');
+  // NumberAnimateCommas(["#Confirmed","#Recovered","#Deaths"]);
+});
