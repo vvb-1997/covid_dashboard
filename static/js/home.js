@@ -101,16 +101,16 @@ function rowCreator(i,data){
 }
 
 function dataAppend(data_point){
-  console.log(data_point['Total_cases'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-  $('#Confirmed').text(data_point['Total_cases']);
-  $('#Active').text(data_point['Total_cases'] - (data_point['Total_recovered']+data_point['Total_deaths']));
-  $('#Recovered').text(data_point['Total_recovered']);
-  $('#Deaths').text(data_point['Total_deaths']);
+  // console.log(data_point['Total_cases'].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+  $('#Confirmed').text(commaSeparateNumber(data_point['Total_cases']));
+  $('#Active').text(commaSeparateNumber(data_point['Total_cases'] - (data_point['Total_recovered']+data_point['Total_deaths'])));
+  $('#Recovered').text(commaSeparateNumber(data_point['Total_recovered']));
+  $('#Deaths').text(commaSeparateNumber(data_point['Total_deaths']));
   $('#NewConfirmed').text(commaSeparateNumber(data_point['New_cases']));
   $('#NewActive').text(commaSeparateNumber(data_point['New_cases'] - (data_point['New_recovered']+data_point['New_deaths'])));
   $('#NewRecovered').text(commaSeparateNumber(data_point['New_recovered']));
   $('#NewDeaths').text(commaSeparateNumber(data_point['New_deaths']));
-  NumberAnimate(["#Confirmed","#Recovered","#Deaths","#Active"]);
+  // NumberAnimate(["#Confirmed","#Recovered","#Deaths","#Active"]);
   // NumberAnimateCommas(["#Confirmed","#Recovered","#Deaths"]);
 }
 
@@ -119,10 +119,6 @@ function tableAppend(data_point){
 
   var i=1;
   console.log(data_point);
-  // data_point.sort(function (a, b) {
-  //   return a.Total_cases.localeCompare(b.Total_cases);
-  // });
-  // console.log(data_point);
 
   $.each(data_point, function(index,jsonObject){
     html_out += rowCreator(i,jsonObject);
@@ -132,6 +128,84 @@ function tableAppend(data_point){
   // console.log(html_out);
   $('#countries').html(html_out);
   $('#countries').DataTable();
+}
+
+function piechart(data_point){
+
+  data = {
+    datasets: [{
+        label: 'Covid-19',
+        data: [data_point['Total_cases'] - (data_point['Total_recovered']+data_point['Total_deaths']),data_point['Total_recovered'],data_point['Total_deaths']],
+        backgroundColor: ["blue", "green", "red"],
+        borderColor: "#fff"
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Active',
+        'Recovered',
+        'Deaths'
+    ]
+  };
+
+  options = {
+    responsive: true,
+    maintainAspectRatio: true,
+    cutoutPercentage: 50,
+    tooltips: {
+     enabled: true,
+     mode: 'single',
+     callbacks: {
+       title: function(tooltipItem, data) {
+         return data['labels'][tooltipItem[0]['index']];
+       },
+       label: function(tooltipItem, data) {
+         return commaSeparateNumber(data['datasets'][0]['data'][tooltipItem['index']]);
+       },
+       afterLabel: function(tooltipItem, data) {
+         var dataset = data['datasets'][0];
+         var percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]['total']) * 100)
+         return '(' + percent + '%)';
+       }
+      }
+    },
+    plugins: {
+     datalabels: {
+       formatter: (value, ctx) => {
+         let datasets = ctx.chart.data.datasets;
+
+         if (datasets.indexOf(ctx.dataset) === datasets.length - 1) {
+           let sum = datasets[0].data.reduce((a, b) => a + b, 0);
+           let percentage = Math.round((value / sum) * 100) + '%';
+           return percentage;
+         } else {
+           return percentage;
+         }
+       },
+       color: '#fff',
+     }
+    },
+    animation:{
+      // duration: 1000,
+      animateRotate: true,
+      animateScale: true,
+    },
+    legend: {
+      display: true,
+      position: 'right',
+      align: 'end',
+      labels: {
+        fontSize: 15,
+      }
+    }
+  };
+
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: data,
+    options: options
+  });
 }
 
 function ajaxCall(data_url){
@@ -148,13 +222,11 @@ function ajaxCall(data_url){
   .done(function( response ) {
     dataAppend(response['Global']);
     tableAppend(sort_object_of_objects(response, 'Total_cases'));
-    // console.log(response);
+    piechart(response['Global']);
     console.log(sort_object_of_objects(response, 'Total_cases'));
   });
 }
 
 $(document).ready(function(){
   ajaxCall(data_url);
-  // NumberAnimate('#Confirmed');
-  // NumberAnimateCommas(["#Confirmed","#Recovered","#Deaths"]);
 });

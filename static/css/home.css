@@ -36,3 +36,9 @@ hr{
 #bottom{
   padding-bottom: 3%;
 }
+
+canvas{
+  width:80% !important;
+  height:50% !important;
+  margin: auto;
+}
