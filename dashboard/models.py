@@ -49,3 +49,19 @@ class summaryData(models.Model):
 
     class Meta:
         verbose_name_plural = "Summary Data"
+
+class HistoricalData(models.Model):
+    Slug = models.CharField(max_length=50,blank=True)
+    Country = models.CharField(max_length=50,blank=True)
+    text = models.TextField()
+    Confirmed = models.TextField()
+    Date = models.TextField()
+    Deaths = models.TextField()
+    Recovered = models.TextField()
+    Active = models.TextField()
+
+    def __str__(self):
+        return self.Country
+
+    class Meta:
+        verbose_name_plural = "Historical Data"

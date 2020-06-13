@@ -1,9 +1,10 @@
 from django.shortcuts import render
 import requests
 from django.http import HttpResponse,JsonResponse
-from .models import dashboardData,CountrySlug,summaryData
+from .models import dashboardData,CountrySlug,summaryData,HistoricalData
 import time
 from datetime import datetime
+import pandas as pd
 
 def data_from_model():
     #old way to retrive data from api pros: real time : cons time consuming
@@ -144,5 +145,42 @@ def summary_append(request):
         obj.save()
 
         print(data_items['Country'] + " Done")
+
+    return HttpResponse('<h1>Done!!</h1>')
+
+#view url 127.0.0.1:8000/country
+def country_wise_hist_data(request):
+    start_time = time.time()
+
+    Country_slug = list(summaryData.objects.all().values_list('Slug', flat=True) )
+
+    for country in Country_slug:
+        if(country != ''):
+            values = requests.get('https://api.covid19api.com/total/country/'+country)
+            data = values.json()
+            df = pd.DataFrame(data)
+            df = df.applymap(str)
+            df['Date'] = pd.to_datetime(df['Date'])
+
+            if HistoricalData.objects.filter(Country = country).exists():
+                print('exists')
+                obj = HistoricalData.objects.get(Country = country)
+            else:
+                obj = HistoricalData()
+
+            obj.Slug = country
+            obj.Country = data[0]['Country']
+            obj.text = str(data)
+            obj.Confirmed = ','.join(list(df['Active']))
+            obj.Active = ','.join(list(df['Active']))
+            obj.Date = ','.join(list(df['Date'].apply(lambda x: x.strftime('%d-%m-%Y'))))
+            obj.Deaths = ','.join(list(df['Active']))
+            obj.Recovered = ','.join(list(df['Active']))
+
+            obj.save()
+
+            print(country + " Done")
+
+    print(time.time()-start_time)
 
     return HttpResponse('<h1>Done!!</h1>')

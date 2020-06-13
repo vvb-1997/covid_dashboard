@@ -97,6 +97,9 @@ function NumberAnimate(div_id_array){
 }
 
 function rowCreator(i,data){
+  if(data['Country'] == 'Global'){
+    i = '';
+  }
   return "<tr><td>" + i + "</td><td>" + data['Country'] + "</td><td>" + commaSeparateNumber(data['Total_cases'])+ "</td><td>" + commaSeparateNumber(data['New_cases'])+ "</td><td>" + commaSeparateNumber(data['Total_deaths'])+ "</td><td>" + commaSeparateNumber(data['New_deaths'])+ "</td><td>" + commaSeparateNumber(data['Total_recovered'])+ "</td><td>" + commaSeparateNumber(data['New_recovered'])+ "</td></tr>";
 }
 
@@ -117,7 +120,7 @@ function dataAppend(data_point){
 function tableAppend(data_point){
   html_out = "<thead><tr><th>NO.</th><th>Country</th><th>Total Confirmed</th><th>New Cases</th><th>Total Deaths</th><th>New Deaths</th><th>Total Recovered</th><th>New Recovered</th></tr></thead><tbody>";
 
-  var i=1;
+  var i=0;
   console.log(data_point);
 
   $.each(data_point, function(index,jsonObject){
@@ -127,7 +130,12 @@ function tableAppend(data_point){
 
   // console.log(html_out);
   $('#countries').html(html_out);
-  $('#countries').DataTable();
+  $('#countries').DataTable({
+    responsive: true,
+    fixedHeader: {
+        header: true,
+      }
+  });
 }
 
 function piechart(data_point){

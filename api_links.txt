@@ -9,4 +9,4 @@ Postman API website : https://documenter.getpostman.com/view/10808728/SzS8rjbc?v
 Postman:
   summary(One day Increase) : https://api.covid19api.com/summary
   save country Slugs = https://api.covid19api.com/countries
-  get particular country data per day = https://api.covid19api.com/country/<slug>
+  get particular country data per day = https://api.covid19api.com/total/dayone/country/<slug>
