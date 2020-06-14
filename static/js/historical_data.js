@@ -234,6 +234,8 @@ function piechart(data_point){
   });
 }
 
+var object_data;
+
 function linechart(chart_array,data_point){
   var Overall = {
     labels: data_point['Date'].split(','),
@@ -297,7 +299,8 @@ function linechart(chart_array,data_point){
     }]
   };
 
-  var object_data = {'Overall':Overall, 'Confirmed':Confirmed, 'Active':Active, 'Recovered':Recovered, 'Deaths':Deaths };
+  object_data = {'Overall':Overall, 'Confirmed':Confirmed, 'Active':Active, 'Recovered':Recovered, 'Deaths':Deaths };
+
   $.each(chart_array, function(key,value){
     var new_value = value.split('_')[1];
     var ctx = document.getElementById(value).getContext('2d');
@@ -326,8 +329,100 @@ function linechart(chart_array,data_point){
         }
       }
     });
+    line_chart_object[value] = myLineChart;
   });
 }
+
+function updatechart(id){
+  console.log(id);
+  $("#"+id).addClass('active');
+  if(id.split('_')[0] == "linear"){
+    $('#log_'+id.split('_')[1]).removeClass('active');
+  }
+  else{
+    $('#linear_'+id.split('_')[1]).removeClass('active');
+  }
+  var type = id.split('_')[0];
+  var tab_name = id.split('_')[1];
+  var chart_id_name = 'myChart_' + id.split('_')[1];
+  console.log(type,tab_name,chart_id_name);
+  // $('#'+chart_id_name).remove();
+  // $('#'+tab_name).append('<canvas id="' + chart_id_name + '"><canvas>');
+  line_chart_object[chart_id_name].destroy();
+  ctx = document.querySelector('#'+chart_id_name).getContext('2d');
+  if(type == 'linear'){
+    var options = {
+      responsive: true,
+      maintainAspectRatio: true,
+      title: {
+        display: true,
+        text: 'Trend in '+ tab_name +' Cases in '+ countryName,
+      },
+      plugins: {
+        datalabels: {
+            display: false,
+        },
+      },
+      animation: false,
+      scales: {
+        yAxes: [{
+            ticks: {
+                beginAtZero: true
+            }
+        }]
+      }
+    };
+  }
+  else{
+    var options = {
+      responsive: true,
+      maintainAspectRatio: true,
+      title: {
+        display: true,
+        text: 'Trend in '+ tab_name +' Cases in '+ countryName,
+      },
+      plugins: {
+        datalabels: {
+            display: false,
+        },
+      },
+      animation: false,
+      scales: {
+        yAxes: [{
+            type: 'logarithmic',
+            ticks: {
+              autoSkip: true,
+              beginAtZero: true,
+              min: 0,
+              callback: function (value, index, values) {
+                if( value ==1 || value==10 || value==100 || value==1000 || value==10000 || value==100000  || value==1000000 || value==10000000){
+                    if(value < 1000) {
+                      return value;
+                    }
+                    else{
+                      return value/1000 +"K";
+                    }
+                }
+              }
+            },
+            scaleLabel: {
+              display: true,
+              labelString: ''
+            }
+        }]
+      }
+    };
+  }
+  var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: object_data[tab_name],
+    options: options
+  });
+  line_chart_object[type] = myLineChart;
+}
+
+var response_data;
+var line_chart_object = {};
 function ajaxCall(data_url){
   var csrftoken = getCookie('csrftoken');
   var chart_array = ['myChart_Overall','myChart_Confirmed','myChart_Active','myChart_Recovered','myChart_Deaths'];
@@ -350,7 +445,7 @@ function ajaxCall(data_url){
     console.log(response);
     $('.tabular.menu .item').tab();
     $('.load_anchor').removeClass('loading');
-
+    response_data = response;
   });
 }
 

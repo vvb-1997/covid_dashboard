@@ -67,26 +67,58 @@
               <a class="item" data-tab="deaths">Deaths</a>
             </div>
             <div class="ui bottom attached active tab segment" data-tab="overall">
-              <div class="canvas_div">
+              <!-- <button class="ui left attached button">Left</button>
+              <button class="right attached ui button">Right</button> -->
+              <br/>
+              <div class="ui medium buttons">
+                <button class="ui toggle active button button_toggle" id="linear_Overall" onclick="updatechart(this.id)">Linear</button>
+                <button class="ui toggle button" id="log_Overall" onclick="updatechart(this.id)">Logarithmic</button>
+              </div>
+              <br/>
+              <div class="canvas_div" id="Overall">
                 <canvas id="myChart_Overall"></canvas>
               </div>
             </div>
             <div class="ui bottom loading load_anchor attached tab segment" data-tab="confirmed">
-              <div class="canvas_div">
+              <br/>
+              <div class="ui medium buttons">
+                <button class="ui toggle active button button_toggle" id="linear_Confirmed" onclick="updatechart(this.id)">Linear</button>
+                <button class="ui toggle button" id="log_Confirmed" onclick="updatechart(this.id)">Logarithmic</button>
+              </div>
+              <br/>
+              <div class="canvas_div" id="Confirmed">
                 <canvas id="myChart_Confirmed"></canvas>
               </div>
             </div>
             <div class="ui bottom loading load_anchor attached tab segment" data-tab="active">
-              <div class="canvas_div">
+              <br/>
+              <div class="ui medium buttons">
+                <button class="ui toggle active button button_toggle" id="linear_Active" onclick="updatechart(this.id)">Linear</button>
+                <button class="ui toggle button" id="log_Active" onclick="updatechart(this.id)">Logarithmic</button>
+              </div>
+              <br/>
+              <div class="canvas_div" id="Active">
                 <canvas id="myChart_Active"></canvas>
               </div>
             </div>
             <div class="ui bottom loading load_anchor attached tab segment" data-tab="recovered">
-              <div class="canvas_div">
+              <br/>
+              <div class="ui medium buttons">
+                <button class="ui toggle active button button_toggle" id="linear_Recovered" onclick="updatechart(this.id)">Linear</button>
+                <button class="ui toggle button" id="log_Recovered" onclick="updatechart(this.id)">Logarithmic</button>
+              </div>
+              <br/>
+              <div class="canvas_div" id="Recovered">
                 <canvas id="myChart_Recovered"></canvas>
               </div>
             </div>
             <div class="ui bottom loading load_anchor attached tab segment" data-tab="deaths">
+              <br/>
+              <div class="ui medium buttons">
+                <button class="ui toggle active button button_toggle" id="linear_Deaths" onclick="updatechart(this.id)">Linear</button>
+                <button class="ui toggle button" id="log_Deaths" onclick="updatechart(this.id)">Logarithmic</button>
+              </div>
+              <br/>
               <div class="canvas_div">
                 <canvas id="myChart_Deaths"></canvas>
               </div>
