@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render
 import requests
 from django.http import HttpResponse,JsonResponse
@@ -34,18 +35,18 @@ def new_data():
 
     return context
 
-#view url 127.0.0.1/
+#view url 127.0.0.1:8000/
 def home(request):
     return render(request, 'home.html')
 
-#view url 127.0.0.1/whole_data
+#view url 127.0.0.1:8000/whole_data
 def dataAjax(request):
     if request.method == 'POST':
         request_getdata = new_data()
 
         return JsonResponse(request_getdata)
 
-#view url 127.0.0.1/data_collector
+#view url 127.0.0.1:8000/data_collector
 def data_append(request):
 
     values = requests.get('https://coronavirus-19-api.herokuapp.com/countries')
@@ -77,7 +78,7 @@ def data_append(request):
 
     return HttpResponse('<h1>Done!!</h1>')
 
-#view url 127.0.0.1/country_slug
+#view url 127.0.0.1:8000/country_slug
 def slug_append(request):
 
     values = requests.get('https://api.covid19api.com/countries')
@@ -148,39 +149,65 @@ def summary_append(request):
 
     return HttpResponse('<h1>Done!!</h1>')
 
-#view url 127.0.0.1:8000/country
+#view url 127.0.0.1:8000/data_country
 def country_wise_hist_data(request):
     start_time = time.time()
 
     Country_slug = list(summaryData.objects.all().values_list('Slug', flat=True) )
 
-    for country in Country_slug:
-        if(country != ''):
-            values = requests.get('https://api.covid19api.com/total/country/'+country)
-            data = values.json()
-            df = pd.DataFrame(data)
-            df = df.applymap(str)
-            df['Date'] = pd.to_datetime(df['Date'])
+    for slug in Country_slug:
+        if(slug != ''):
+            try:
+                values = requests.get('https://api.covid19api.com/total/country/'+slug)
+                data = values.json()
+                df = pd.DataFrame(data)
+                df = df.applymap(str)
+                df['Date'] = pd.to_datetime(df['Date'])
 
-            if HistoricalData.objects.filter(Country = country).exists():
-                print('exists')
-                obj = HistoricalData.objects.get(Country = country)
-            else:
-                obj = HistoricalData()
+                if HistoricalData.objects.filter(Slug = slug).exists():
+                    print('exists')
+                    obj = HistoricalData.objects.get(Slug = slug)
+                else:
+                    obj = HistoricalData()
 
-            obj.Slug = country
-            obj.Country = data[0]['Country']
-            obj.text = str(data)
-            obj.Confirmed = ','.join(list(df['Active']))
-            obj.Active = ','.join(list(df['Active']))
-            obj.Date = ','.join(list(df['Date'].apply(lambda x: x.strftime('%d-%m-%Y'))))
-            obj.Deaths = ','.join(list(df['Active']))
-            obj.Recovered = ','.join(list(df['Active']))
+                obj.Slug = slug
+                obj.Country = data[0]['Country']
+                obj.text = str(data)
+                obj.Confirmed = ','.join(list(df['Confirmed']))
+                obj.Active = ','.join(list(df['Active']))
+                obj.Date = ','.join(list(df['Date'].apply(lambda x: x.strftime('%d-%m-%Y'))))
+                obj.Deaths = ','.join(list(df['Deaths']))
+                obj.Recovered = ','.join(list(df['Recovered']))
 
-            obj.save()
+                obj.save()
+                print(slug + " Done")
 
-            print(country + " Done")
+            except Exception as e:
+                print(e)
+                print(slug + "Not done")
 
     print(time.time()-start_time)
 
     return HttpResponse('<h1>Done!!</h1>')
+
+#view url 127.0.0.1:8000/country/<slug:slug>
+def historical_trend(request,slug = ''):
+    if HistoricalData.objects.filter(Slug = slug).exists():
+        obj = HistoricalData.objects.get(Slug = slug)
+        countrySlug = obj.Slug
+        country = obj.Country
+    else:
+        raise Http404("No Proper Country")
+    return render(request, 'historical_country.html', context = {'Country' : country, 'Country_Slug' : countrySlug})
+
+#view url 127.0.0.1:8000/historical_data
+def data_hist(request):
+    if request.method == 'POST':
+        slug = request.POST.get("slug")
+        if HistoricalData.objects.filter(Slug = slug).exists():
+            request_getdata = list(HistoricalData.objects.filter(Slug = slug).values())[0]
+            return JsonResponse(request_getdata)
+        else:
+            return JsonResponse({'message':'No data'})
+    else:
+        return HttpResponse('<h1>401 UnAuthorized Access!!</h1>')

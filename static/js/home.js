@@ -99,8 +99,12 @@ function NumberAnimate(div_id_array){
 function rowCreator(i,data){
   if(data['Country'] == 'Global'){
     i = '';
+    Country_url = data['Country']
   }
-  return "<tr><td>" + i + "</td><td>" + data['Country'] + "</td><td>" + commaSeparateNumber(data['Total_cases'])+ "</td><td>" + commaSeparateNumber(data['New_cases'])+ "</td><td>" + commaSeparateNumber(data['Total_deaths'])+ "</td><td>" + commaSeparateNumber(data['New_deaths'])+ "</td><td>" + commaSeparateNumber(data['Total_recovered'])+ "</td><td>" + commaSeparateNumber(data['New_recovered'])+ "</td></tr>";
+  else{
+    Country_url = "<a href = '/country/" + data['Slug'] + "'> " + data['Country'] +"</a>";
+  }
+  return "<tr><td>" + i + "</td><td>" + Country_url + "</td><td>" + commaSeparateNumber(data['Total_cases'])+ "</td><td>" + commaSeparateNumber(data['New_cases'])+ "</td><td>" + commaSeparateNumber(data['Total_deaths'])+ "</td><td>" + commaSeparateNumber(data['New_deaths'])+ "</td><td>" + commaSeparateNumber(data['Total_recovered'])+ "</td><td>" + commaSeparateNumber(data['New_recovered'])+ "</td></tr>";
 }
 
 function dataAppend(data_point){

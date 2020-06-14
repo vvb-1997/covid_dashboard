@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+  {% load static  %}
+
+  {% block head %}
+    <script>
+      var data_url = "{% url 'data_hist' %}";
+      var country_slug = "{{Country_Slug}}";
+      var countryName = "{{Country}}";
+    </script>
+    <script src="{% static 'js/historical_data.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/historical_data.css' %}"/>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.semanticui.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.semanticui.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/fixedheader/3.1.7/js/dataTables.fixedHeader.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.7/css/fixedHeader.dataTables.min.css">
+  {% endblock %}
+
+  {% block content %}
+    <div id = "home_body" >
+      <div class="ui card content_div">
+        <div class="card">
+          <div class="content">
+            <div class="ui two column centered grid">
+              <div id="top" class="six column row centered">
+                <div class="column"><h1> {{Country}} </h1></div>
+              </div>
+              <div id="bottom" class="five column centered row">
+                <div class="column counts ui card"><b>Confirmed</b>
+                  <div class="two row">
+                    <div id="Confirmed" class="column"> 0 </div>
+                    <span id="NewConfirmed" class="jam jam-arrow-circle-up column"> 0 </span>
+                  </div>
+                </div>
+                <div class="column counts ui card"><b>Active</b>
+                  <div class="two row">
+                    <div id="Active" class="column"> 0 </div>
+                    <span class="jam jam-arrow-circle-up column" id="NewActive"> 0 </span>
+                  </div>
+                </div>
+                <div class="column counts ui card"><b>Recovered</b>
+                  <div class="two row">
+                    <div id="Recovered" class="column"> 0 </div>
+                    <span id="NewRecovered" class="jam jam-arrow-circle-up column"> 0 </span>
+                  </div>
+                </div>
+                <div class="column counts ui card"><b>Deaths</b>
+                  <div class="two row">
+                    <div id="Deaths" class="column"> 0 </div>
+                    <span id="NewDeaths" class="jam jam-arrow-circle-up column"> 0 </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <div class="content_div">
+        <!-- <div class="card">
+          <div class="content"> -->
+            <div class="ui top attached tabular menu">
+              <a class="active item" data-tab="overall">Overall Trend</a>
+              <a class="item" data-tab="confirmed">Confirmed</a>
+              <a class="item" data-tab="active">Active</a>
+              <a class="item" data-tab="recovered">Recovered</a>
+              <a class="item" data-tab="deaths">Deaths</a>
+            </div>
+            <div class="ui bottom attached active tab segment" data-tab="overall">
+              <div class="canvas_div">
+                <canvas id="myChart_Overall"></canvas>
+              </div>
+            </div>
+            <div class="ui bottom loading load_anchor attached tab segment" data-tab="confirmed">
+              <div class="canvas_div">
+                <canvas id="myChart_Confirmed"></canvas>
+              </div>
+            </div>
+            <div class="ui bottom loading load_anchor attached tab segment" data-tab="active">
+              <div class="canvas_div">
+                <canvas id="myChart_Active"></canvas>
+              </div>
+            </div>
+            <div class="ui bottom loading load_anchor attached tab segment" data-tab="recovered">
+              <div class="canvas_div">
+                <canvas id="myChart_Recovered"></canvas>
+              </div>
+            </div>
+            <div class="ui bottom loading load_anchor attached tab segment" data-tab="deaths">
+              <div class="canvas_div">
+                <canvas id="myChart_Deaths"></canvas>
+              </div>
+            </div>
+            <br/>
+          <!-- </div>
+        </div> -->
+      </div>
+      <br/>
+    <!-- <div id="countries_div"> -->
+
+    <div class="ui card content_div">
+      <div class="card">
+        <div class="content table_data">
+          <table class="ui celled table" id="countries"></table>
+          </div>
+      </div>
+    </div>
+    <br/>
+    </div>
+
+
+  {% endblock %}

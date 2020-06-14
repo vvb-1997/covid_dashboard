@@ -1,0 +1,44 @@
+#home_body{
+  /* height: 500px; */
+  /* padding-top: 100px; */
+  /* width: 80%; */
+  margin: auto;
+}
+
+.content_div{
+  width: 80% !important;
+  margin: auto !important;
+}
+
+.table_data{
+  padding: 10px;
+}
+
+#countries_div{
+  width: 80% !important;
+  margin: auto !important;
+}
+
+hr{
+  width: 80%;
+}
+
+#top{
+  padding-top: 3%;
+}
+
+.counts {
+  border-radius: 25px;
+  margin: 10px !important;
+  text-align: center !important;
+}
+
+#bottom{
+  padding-bottom: 3%;
+}
+
+.canvas_div{
+  width:80% !important;
+  height:50% !important;
+  margin: auto;
+}
