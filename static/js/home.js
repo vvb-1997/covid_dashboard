@@ -141,6 +141,15 @@ function tableAppend(data_point){
       }
   });
 }
+// var defaultLegendClickHandler = Chart.defaults.global.legend.onClick;
+// function newLegendClickHandle(e,legendItem){
+//   var index = legendItem.datasetIndex;
+//   console.log(index);
+//   if (index > 1) {
+//       // Do the original logic
+//       defaultLegendClickHandler(e, legendItem);
+//   }
+// }
 
 function piechart(data_point){
 
@@ -176,7 +185,7 @@ function piechart(data_point){
        },
        afterLabel: function(tooltipItem, data) {
          var dataset = data['datasets'][0];
-         var percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]['total']) * 100)
+         var percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]['total']) * 100);
          return '(' + percent + '%)';
        }
       }
@@ -208,10 +217,12 @@ function piechart(data_point){
       align: 'end',
       labels: {
         fontSize: 15,
-      }
+      },
+      onClick: null
     }
   };
 
+  console.log(options);
   var ctx = document.getElementById('myChart').getContext('2d');
   var myPieChart = new Chart(ctx, {
     type: 'pie',

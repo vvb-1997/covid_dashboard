@@ -83,9 +83,12 @@ function commaSeparateNumber(val){
   return val;
 }
 
-function lastOccurance(val, last_day_flag = false){
+function lastOccurance(val, last_day_flag = false, only_number_flag = false){
   var idx = val.lastIndexOf(',');
-  if(last_day_flag){
+  if(only_number_flag){
+    return parseInt(val.substring(idx + 1).trim());
+  }
+  else if(last_day_flag){
     latest_figure = val.substring(idx + 1).trim();
     var temp = val.substring(0,idx).trim();
     var new_idx = temp.lastIndexOf(',');
@@ -135,6 +138,15 @@ function dataAppend(data_point){
   // NumberAnimateCommas(["#Confirmed","#Recovered","#Deaths"]);
 }
 
+function dateFormater(dateString){
+  // console.log(dateString);
+  var parts = dateString.split('-');
+  var date = new Date(parts[2],parts[1],parts[0])
+  // const formatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+  const formatter = new Intl.DateTimeFormat('en-GB', { month: 'short', day: 'numeric' });
+  return formatter.format(date);
+}
+
 function tableAppend(data_point){
   html_out = "<thead><tr><th>NO.</th><th>Country</th><th>Total Confirmed</th><th>New Cases</th><th>Total Deaths</th><th>New Deaths</th><th>Total Recovered</th><th>New Recovered</th></tr></thead><tbody>";
 
@@ -161,7 +173,7 @@ function piechart(data_point){
   data = {
     datasets: [{
         label: 'Covid-19',
-        data: [data_point['Total_cases'] - (data_point['Total_recovered']+data_point['Total_deaths']),data_point['Total_recovered'],data_point['Total_deaths']],
+        data: [lastOccurance(data_point['Active'],false,true), lastOccurance(data_point['Recovered'],false,true), lastOccurance(data_point['Deaths'],false,true)],
         backgroundColor: ["blue", "green", "red"],
         borderColor: "#fff"
     }],
@@ -220,6 +232,7 @@ function piechart(data_point){
       display: true,
       position: 'right',
       align: 'end',
+      onClick: null,
       labels: {
         fontSize: 15,
       }
@@ -227,6 +240,7 @@ function piechart(data_point){
   };
 
   var ctx = document.getElementById('myChart').getContext('2d');
+  console.log(options);
   var myPieChart = new Chart(ctx, {
     type: 'pie',
     data: data,
@@ -235,27 +249,30 @@ function piechart(data_point){
 }
 
 var object_data;
-
 function linechart(chart_array,data_point){
   var Overall = {
     labels: data_point['Date'].split(','),
     datasets :[{
       data: data_point['Confirmed'].split(',').map(function(item) {return parseInt(item, 10);}),
+      pointRadius: 0,
       label: "Confirmed",
       borderColor: "#7b7575",
       fill: false
     },{
       data: data_point['Active'].split(',').map(function(item) {return parseInt(item, 10);}),
+      pointRadius: 0,
       label: "Active",
       borderColor: "#00f",
       fill: false
     },{
       data: data_point['Recovered'].split(',').map(function(item) {return parseInt(item, 10);}),
+      pointRadius: 0,
       label: "Recovered",
       borderColor: "#008000",
       fill: false
     },{
       data: data_point['Deaths'].split(',').map(function(item) {return parseInt(item, 10);}),
+      pointRadius: 0,
       label: "Deaths",
       borderColor: "#ff0000",
       borderWidth: 1,
@@ -266,6 +283,7 @@ function linechart(chart_array,data_point){
     labels: data_point['Date'].split(','),
     datasets :[{
       data: data_point['Confirmed'].split(',').map(function(item) {return parseInt(item, 10);}),
+      pointRadius: 0,
       label: "Confirmed",
       borderColor: "#7b7575",
       fill: false
@@ -275,6 +293,7 @@ function linechart(chart_array,data_point){
     labels: data_point['Date'].split(','),
     datasets :[{
       data: data_point['Active'].split(',').map(function(item) {return parseInt(item, 10);}),
+      pointRadius: 0,
       label: "Active",
       borderColor: "#00f",
       fill: false
@@ -284,6 +303,7 @@ function linechart(chart_array,data_point){
     labels: data_point['Date'].split(','),
     datasets :[{
       data: data_point['Recovered'].split(',').map(function(item) {return parseInt(item, 10);}),
+      pointRadius: 0,
       label: "Recovered",
       borderColor: "#008000",
       fill: false
@@ -293,6 +313,7 @@ function linechart(chart_array,data_point){
     labels: data_point['Date'].split(','),
     datasets :[{
       data: data_point['Deaths'].split(',').map(function(item) {return parseInt(item, 10);}),
+      pointRadius: 0,
       label: "Deaths",
       borderColor: "#ff0000",
       fill: false
@@ -310,6 +331,20 @@ function linechart(chart_array,data_point){
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        animation: false,
+        tooltips: {
+          enabled: true,
+          mode: 'single',
+          callbacks: {
+            title: function(tooltipItem, data) {
+              return dateFormater(data['labels'][tooltipItem[0]['index']]);
+            },
+            label: function(tooltipItem, data) {
+              // return commaSeparateNumber(data['datasets'][0]['data'][tooltipItem['index']]);
+              return commaSeparateNumber(tooltipItem['value']);
+            },
+          }
+        },
         title: {
           display: true,
           text: 'Trend in '+ new_value +' Cases in '+ countryName,
@@ -319,12 +354,24 @@ function linechart(chart_array,data_point){
               display: false,
           },
         },
-        animation: false,
         scales: {
-          yAxes: [{
-              ticks: {
-                  beginAtZero: true
+          xAxes: [{
+            gridLines: {
+              display: false,
+            },
+            ticks:{
+              callback: function(value, index, values) {
+                return dateFormater(value);
               }
+            }
+          }],
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              callback: function(value, index, values) {
+                return commaSeparateNumber(value);
+              }
+            }
           }]
         }
       }
@@ -334,7 +381,7 @@ function linechart(chart_array,data_point){
 }
 
 function updatechart(id){
-  console.log(id);
+
   $("#"+id).addClass('active');
   if(id.split('_')[0] == "linear"){
     $('#log_'+id.split('_')[1]).removeClass('active');
@@ -342,18 +389,32 @@ function updatechart(id){
   else{
     $('#linear_'+id.split('_')[1]).removeClass('active');
   }
+
   var type = id.split('_')[0];
   var tab_name = id.split('_')[1];
   var chart_id_name = 'myChart_' + id.split('_')[1];
   console.log(type,tab_name,chart_id_name);
-  // $('#'+chart_id_name).remove();
-  // $('#'+tab_name).append('<canvas id="' + chart_id_name + '"><canvas>');
+
   line_chart_object[chart_id_name].destroy();
   ctx = document.querySelector('#'+chart_id_name).getContext('2d');
+
   if(type == 'linear'){
     var options = {
       responsive: true,
       maintainAspectRatio: true,
+      animation: false,
+      tooltips: {
+        enabled: true,
+        mode: 'single',
+        callbacks: {
+          title: function(tooltipItem, data) {
+            return dateFormater(data['labels'][tooltipItem[0]['index']]);
+          },
+          label: function(tooltipItem, data) {
+            return commaSeparateNumber(data['datasets'][0]['data'][tooltipItem['index']]);
+          },
+        }
+      },
       title: {
         display: true,
         text: 'Trend in '+ tab_name +' Cases in '+ countryName,
@@ -363,12 +424,26 @@ function updatechart(id){
             display: false,
         },
       },
-      animation: false,
       scales: {
-        yAxes: [{
-            ticks: {
-                beginAtZero: true
+        xAxes: [{
+          gridLines: {
+            display: false,
+          },
+          ticks:{
+            callback: function(value, index, values) {
+              return dateFormater(value);
             }
+          }
+        }],
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            ticks:{
+              callback: function(value, index, values) {
+                return dateFormater(value);
+              }
+            }
+          }
         }]
       }
     };
@@ -377,6 +452,19 @@ function updatechart(id){
     var options = {
       responsive: true,
       maintainAspectRatio: true,
+      animation: false,
+      tooltips: {
+        enabled: true,
+        mode: 'single',
+        callbacks: {
+          title: function(tooltipItem, data) {
+            return dateFormater(data['labels'][tooltipItem[0]['index']]);
+          },
+          label: function(tooltipItem, data) {
+            return commaSeparateNumber(data['datasets'][0]['data'][tooltipItem['index']]);
+          },
+        }
+      },
       title: {
         display: true,
         text: 'Trend in '+ tab_name +' Cases in '+ countryName,
@@ -386,8 +474,17 @@ function updatechart(id){
             display: false,
         },
       },
-      animation: false,
       scales: {
+        xAxes: [{
+          gridLines: {
+            display: false,
+          },
+          ticks:{
+            callback: function(value, index, values) {
+              return dateFormater(value);
+            }
+          }
+        }],
         yAxes: [{
             type: 'logarithmic',
             ticks: {
@@ -396,12 +493,7 @@ function updatechart(id){
               min: 0,
               callback: function (value, index, values) {
                 if( value ==1 || value==10 || value==100 || value==1000 || value==10000 || value==100000  || value==1000000 || value==10000000){
-                    if(value < 1000) {
-                      return value;
-                    }
-                    else{
-                      return value/1000 +"K";
-                    }
+                  return commaSeparateNumber(value);
                 }
               }
             },
@@ -439,10 +531,10 @@ function ajaxCall(data_url){
     }
   })
   .done(function( response ) {
-    dataAppend(response);
-    // tableAppend(sort_object_of_objects(response, 'Total_cases'));
-    linechart(chart_array,response);
     console.log(response);
+    dataAppend(response);
+    piechart(response);
+    linechart(chart_array,response);
     $('.tabular.menu .item').tab();
     $('.load_anchor').removeClass('loading');
     response_data = response;
