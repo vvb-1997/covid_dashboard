@@ -411,7 +411,7 @@ function updatechart(id){
             return dateFormater(data['labels'][tooltipItem[0]['index']]);
           },
           label: function(tooltipItem, data) {
-            return commaSeparateNumber(data['datasets'][0]['data'][tooltipItem['index']]);
+            return commaSeparateNumber(tooltipItem['value']);
           },
         }
       },
@@ -438,10 +438,8 @@ function updatechart(id){
         yAxes: [{
           ticks: {
             beginAtZero: true,
-            ticks:{
-              callback: function(value, index, values) {
-                return dateFormater(value);
-              }
+            callback: function(value, index, values) {
+              return commaSeparateNumber(value);
             }
           }
         }]
@@ -461,7 +459,7 @@ function updatechart(id){
             return dateFormater(data['labels'][tooltipItem[0]['index']]);
           },
           label: function(tooltipItem, data) {
-            return commaSeparateNumber(data['datasets'][0]['data'][tooltipItem['index']]);
+            return commaSeparateNumber(tooltipItem['value']);
           },
         }
       },
@@ -505,6 +503,7 @@ function updatechart(id){
       }
     };
   }
+
   var myLineChart = new Chart(ctx, {
     type: 'line',
     data: object_data[tab_name],
