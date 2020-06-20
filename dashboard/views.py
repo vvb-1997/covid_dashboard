@@ -6,6 +6,8 @@ from .models import dashboardData,CountrySlug,summaryData,HistoricalData
 import time
 from datetime import datetime
 import pandas as pd
+from plotly.offline import plot
+from plotly.graph_objs import Scatter
 
 def data_from_model():
     #old way to retrive data from api pros: real time : cons time consuming
@@ -43,8 +45,10 @@ def home(request):
 def dataAjax(request):
     if request.method == 'POST':
         request_getdata = new_data()
-
+        print(request_getdata)
         return JsonResponse(request_getdata)
+    else:
+        return HttpResponse('<h1>UnAuthorized!!</h1>')
 
 #view url 127.0.0.1:8000/data_collector
 def data_append(request):
@@ -211,3 +215,14 @@ def data_hist(request):
             return JsonResponse({'message':'No data'})
     else:
         return HttpResponse('<h1>401 UnAuthorized Access!!</h1>')
+
+#view url 127.0.0.1:8000/trend_heatmap
+def trend_heatmap(request):
+    # x_data = [0,1,2,3]
+    # y_data = [x**2 for x in x_data]
+    # plot_div = plot([Scatter(x=x_data, y=y_data,
+    #                     mode='lines', name='test',
+    #                     opacity=0.8)],
+    #            output_type='div')
+    # return render(request, "trend_heatmap.html", context={'plot_div': plot_div})
+    return render(request,'trend_heatmap.html',{})

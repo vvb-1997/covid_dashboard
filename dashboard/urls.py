@@ -12,4 +12,6 @@ urlpatterns = [
     path('data_country/', views.country_wise_hist_data, name = "country_wise_hist_data"),
     path('country/<str:slug>', views.historical_trend, name = "historical_trend"),
 
+    path('trend_heatmap/',views.trend_heatmap, name = "trend_heatmap"),
+
 ]
