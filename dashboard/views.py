@@ -45,7 +45,6 @@ def home(request):
 def dataAjax(request):
     if request.method == 'POST':
         request_getdata = new_data()
-        print(request_getdata)
         return JsonResponse(request_getdata)
     else:
         return HttpResponse('<h1>UnAuthorized!!</h1>')

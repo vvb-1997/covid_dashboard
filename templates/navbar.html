@@ -7,9 +7,10 @@
     </a> -->
     <a href="{% url 'Dashboard' %}" class="item">Home</a>
     <div class="ui simple dropdown item">
-      Dropdown <i class="dropdown icon"></i>
+      Visualization
+      <i class="dropdown icon"></i>
       <div class="menu">
-        <a class="item" href="#">Link Item</a>
+        <a class="item" href="{% url 'trend_heatmap' %}">Choropleth map</a>
         <a class="item" href="#">Link Item</a>
         <div class="divider"></div>
         <div class="header">Header Item</div>

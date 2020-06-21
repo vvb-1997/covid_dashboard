@@ -102,29 +102,50 @@ function ready(error, topo) {
   }
 }
 
+function data_for_amcharts(covid_data){
+
+  var temp_dict_amcharts = {};
+  var array_data = ['Total_cases','Total_deaths','Total_recovered','Total_active'];
+
+  $.each(array_data, function(key, array_item){
+
+    //no data for some countries creation default values
+    var cases_array = [
+      {'id':'GL','name':'Greeland','value':0},
+      {'id':'SJ','name':'Svalbard and Jan Mayen','value':0},
+      {'id':'GF','name':'French Guiana','value':0},
+      {'id':'TM','name':'Turkmenistan','value':0},
+      {'id':'KP','name':'North Korea','value':0},
+    ];
+
+    $.each( covid_data, function( key, value ) {
+
+      if(array_item == "Total_active"){
+        value_data = value['Total_cases'] - (value['Total_recovered']+value['Total_deaths']);
+      }
+      else{
+        value_data = value[array_item];
+      }
+
+      cases_array.push({
+        "id" : value['Country_code'],
+        "value" : value_data,
+        "name" : value['Country']
+      });
+    });
+    temp_dict_amcharts[array_item] = cases_array;
+  });
+  // console.log(temp_dict_amcharts);
+  return temp_dict_amcharts;
+}
+
 function amchartsMap(covid_data){
 
   console.log(covid_data);
   am4core.useTheme(am4themes_animated);
 
-  // confirmed_cases_array = [];
-
-  //no data for some countries creation default values
-  confirmed_cases_array = [
-    {'id':'GL','name':'Greeland','value':0},
-    {'id':'SJ','name':'Svalbard and Jan Mayen','value':0},
-    {'id':'GF','name':'French Guiana','value':0},
-    {'id':'TM','name':'Turkmenistan','value':0},
-    {'id':'KP','name':'North Korea','value':0},
-  ];
-
-  $.each( covid_data, function( key, value ) {
-    confirmed_cases_array.push({
-      "id" : value['Country_code'],
-      "value" : value['Total_cases'],
-      "name" : value['Country']
-    });
-  });
+  dict_amcharts = data_for_amcharts(covid_data);
+  confirmed_cases_array = dict_amcharts['Total_cases'];
   console.log(confirmed_cases_array);
 
   var chart = am4core.create("chartdiv", am4maps.MapChart);
@@ -150,25 +171,18 @@ function amchartsMap(covid_data){
     "max": am4core.color("#660000")
   });
 
-  // var heatLegend = chart.createChild(am4maps.HeatLegend);
-  // heatLegend.series = polygonSeries;
-  // heatLegend.width = am4core.percent(100);
-  //
-  // polygonSeries.mapPolygons.template.events.on("over", function(ev) {
-  // if (!isNaN(ev.target.dataItem.value)) {
-  //   heatLegend.valueAxis.showTooltipAt(ev.target.dataItem.value)
-  // }
-  // else {
-  //   heatLegend.valueAxis.hideTooltip();
-  // }
-  // });
-  //
-  // polygonSeries.mapPolygons.template.events.on("out", function(ev) {
-  //   heatLegend.valueAxis.hideTooltip();
-  // });
+  console.log(polygonSeries);
+
+  var title = chart.chartContainer.createChild(am4core.Label);
+  title.text = "Confirmed Cases Per Country";
+  title.fontSize = 20;
+  title.paddingTop = 30;
+  title.align = "center";
+  title.zIndex = 100;
 
   // add heat legend
   var heatLegend = chart.chartContainer.createChild(am4maps.HeatLegend);
+  heatLegend.id = "heatLegend";
   heatLegend.valign = "bottom";
   heatLegend.align = "left";
   heatLegend.width = am4core.percent(100);
@@ -177,6 +191,34 @@ function amchartsMap(covid_data){
   heatLegend.padding(20, 20, 20, 20);
   heatLegend.valueAxis.renderer.labels.template.fontSize = 10;
   heatLegend.valueAxis.renderer.minGridDistance = 40;
+
+//   // Set up custom heat map legend labels using axis ranges
+//   var minRange = heatLegend.valueAxis.axisRanges.create();
+//   minRange.label.horizontalCenter = "left";
+//
+//   var maxRange = heatLegend.valueAxis.axisRanges.create();
+//   maxRange.label.horizontalCenter = "right";
+//
+//   // Blank out internal heat legend value axis labels
+//   heatLegend.valueAxis.renderer.labels.template.adapter.add("text", function(labelText) {
+//     return "";
+//   });
+//
+// // Update heat legend value labels
+//   polygonSeries.events.on("datavalidated", function(ev) {
+//     var heatLegend = ev.target.map.getKey("heatLegend");
+//
+//     var min = heatLegend.series.dataItem.values.value.low;
+//     var minRange = heatLegend.valueAxis.axisRanges.getIndex(0);
+//     minRange.value = min;
+//     minRange.label.text = "" + heatLegend.numberFormatter.format(min);
+//
+//     var max = heatLegend.series.dataItem.values.value.high;
+//     console.log(heatLegend.series.dataItem.values.value);
+//     var maxRange = heatLegend.valueAxis.axisRanges.getIndex(1);
+//     maxRange.value = max;
+//     maxRange.label.text = "" + heatLegend.numberFormatter.format(max);
+//   });
 
   polygonSeries.mapPolygons.template.events.on("over", event => {
     handleHover(event.target);
@@ -221,7 +263,7 @@ function ajaxCall(data_url){
   })
   .done(function( response ) {
     // console.log(response);
-    console.log(data_url);
+    delete response['Global'];
     amchartsMap(response);
   });
 }
