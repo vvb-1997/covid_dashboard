@@ -217,11 +217,20 @@ def data_hist(request):
 
 #view url 127.0.0.1:8000/trend_heatmap
 def trend_heatmap(request):
-    # x_data = [0,1,2,3]
-    # y_data = [x**2 for x in x_data]
-    # plot_div = plot([Scatter(x=x_data, y=y_data,
-    #                     mode='lines', name='test',
-    #                     opacity=0.8)],
-    #            output_type='div')
-    # return render(request, "trend_heatmap.html", context={'plot_div': plot_div})
     return render(request,'trend_heatmap.html',{})
+
+def population_data(request):
+    df = pd.read_excel(open('static/misc/world_population_area_data.xlsx','rb'),sheet_name = "Sheet2")
+    print(df)
+
+    for index,row in df.iterrows():
+        if summaryData.objects.filter(Country_code = row['Country Code']).exists():
+            obj = summaryData.objects.get(Country_code = row['Country Code'])
+            obj.Population = row['Population']
+            obj.Size = row['Size']
+
+            obj.save()
+        else:
+            print(row['Country Code'])
+
+    return HttpResponse('<h1>Done!!</h1>')

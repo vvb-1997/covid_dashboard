@@ -104,7 +104,7 @@ function rowCreator(i,data){
   else{
     Country_url = "<a href = '/country/" + data['Slug'] + "'> " + data['Country'] +"</a>";
   }
-  return "<tr><td>" + i + "</td><td>" + Country_url + "</td><td>" + commaSeparateNumber(data['Total_cases'])+ "</td><td>" + commaSeparateNumber(data['New_cases'])+ "</td><td>" + commaSeparateNumber(data['Total_deaths'])+ "</td><td>" + commaSeparateNumber(data['New_deaths'])+ "</td><td>" + commaSeparateNumber(data['Total_recovered'])+ "</td><td>" + commaSeparateNumber(data['New_recovered'])+ "</td></tr>";
+  return "<tr><td>" + i + "</td><td>" + Country_url + "</td><td>" + commaSeparateNumber(data['Total_cases'])+ "</td><td>" + commaSeparateNumber(data['New_cases'])+ "</td><td>" + commaSeparateNumber(data['Total_deaths'])+ "</td><td>" + commaSeparateNumber(data['New_deaths'])+ "</td><td>" + commaSeparateNumber(data['Total_recovered'])+ "</td><td>" + commaSeparateNumber(data['New_recovered'])+ "</td><td>" + commaSeparateNumber(data['Population'])+ "</td><td>" + Math.round((data['Total_cases']/data['Population'])*1000000)+ "</td></tr>";
 }
 
 function dataAppend(data_point){
@@ -122,7 +122,7 @@ function dataAppend(data_point){
 }
 
 function tableAppend(data_point){
-  html_out = "<thead><tr><th>NO.</th><th>Country</th><th>Total Confirmed</th><th>New Cases</th><th>Total Deaths</th><th>New Deaths</th><th>Total Recovered</th><th>New Recovered</th></tr></thead><tbody>";
+  html_out = "<thead><tr><th>NO.</th><th>Country</th><th>Total Confirmed</th><th>New Cases</th><th>Total Deaths</th><th>New Deaths</th><th>Total Recovered</th><th>New Recovered</th><th>Population</th><th>Cases Per Million</th></tr></thead><tbody>";
 
   var i=0;
   console.log(data_point);

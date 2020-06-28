@@ -43,6 +43,8 @@ class summaryData(models.Model):
     Total_recovered = models.IntegerField(blank=True,null=True)
     New_recovered = models.IntegerField(blank=True,null=True)
     Last_updated = models.DateTimeField()
+    Population = models.IntegerField(blank=True,default=0)
+    Size = models.IntegerField(blank=True,default=0)
 
     def __str__(self):
         return self.Country
