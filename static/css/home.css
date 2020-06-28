@@ -42,3 +42,9 @@ canvas{
   height:50% !important;
   margin: auto;
 }
+
+#last_updated{
+  padding-right: 40px;
+  color: red;
+  padding-bottom: 0px;
+}

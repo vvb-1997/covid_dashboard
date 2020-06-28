@@ -83,9 +83,12 @@ function commaSeparateNumber(val){
   return val;
 }
 
-function lastOccurance(val, last_day_flag = false, only_number_flag = false){
+function lastOccurance(val, last_day_flag = false, only_number_flag = false, date_flag = false){
   var idx = val.lastIndexOf(',');
-  if(only_number_flag){
+  if(date_flag){
+    return val.substring(idx + 1).trim();
+  }
+  else if(only_number_flag){
     return parseInt(val.substring(idx + 1).trim());
   }
   else if(last_day_flag){
@@ -138,13 +141,20 @@ function dataAppend(data_point){
   // NumberAnimateCommas(["#Confirmed","#Recovered","#Deaths"]);
 }
 
-function dateFormater(dateString){
+function dateFormater(dateString,update_flag=false){
   // console.log(dateString);
   var parts = dateString.split('-');
-  var date = new Date(parts[2],parts[1],parts[0])
-  // const formatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
-  const formatter = new Intl.DateTimeFormat('en-GB', { month: 'short', day: 'numeric' });
-  return formatter.format(date);
+  var date = new Date(parts[2],parts[1],parts[0]);
+
+  if(update_flag){
+    const formatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+    return formatter.format(date);
+  }
+  else{
+    // const formatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+    const formatter = new Intl.DateTimeFormat('en-GB', { month: 'short', day: 'numeric' });
+    return formatter.format(date);
+  }
 }
 
 function tableAppend(data_point){
@@ -536,6 +546,9 @@ function ajaxCall(data_url){
     linechart(chart_array,response);
     $('.tabular.menu .item').tab();
     $('.load_anchor').removeClass('loading');
+    // console.log(lastOccurance(response['Date'],false,false,true));
+    $('#last_updated h4 span').text(dateFormater(lastOccurance(response['Date'],false,false,true),true));
+    console.log(response);
     response_data = response;
   });
 }

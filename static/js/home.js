@@ -151,6 +151,12 @@ function tableAppend(data_point){
 //   }
 // }
 
+function dateFormater(dateString){
+  var date = new Date(Date.parse(dateString));
+  const formatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+  return formatter.format(date);
+}
+
 function piechart(data_point){
 
   data = {
@@ -246,6 +252,7 @@ function ajaxCall(data_url){
     dataAppend(response['Global']);
     tableAppend(sort_object_of_objects(response, 'Total_cases'));
     piechart(response['Global']);
+    $('#last_updated h4 span').text(dateFormater(response['Global']['Last_updated']));
     console.log(sort_object_of_objects(response, 'Total_cases'));
   });
 }

@@ -46,3 +46,9 @@ hr{
 .button_toggle{
   margin-left: 80% !important;
 }
+
+#last_updated{
+  padding-right: 40px;
+  color: red;
+  padding-bottom: 0px;
+}
